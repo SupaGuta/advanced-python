@@ -1,0 +1,195 @@
+-------[ "Import NumPy" ]----------------------------------------------------------------------------
+
+import numpy as np
+
+
+-------[ "Define Python List" ]----------------------------------------------------------------------
+
+py_list = [1, 2, 3, 4, 5]
+
+
+-------[ "Convert to NumPy Array" ]------------------------------------------------------------------
+
+numpy_array = np.array(py_list)
+
+
+-------[ "Print NumPy Array" ]-----------------------------------------------------------------------
+
+print("This is a NumPy array.")
+print(numpy_array)
+
+
+-------[ "Create a 2D Array" ]-----------------------------------------------------------------------
+
+data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+multi = np.array(data)
+
+
+-------[ "Print 2D Array" ]--------------------------------------------------------------------------
+
+print("This is a 2D array.")
+print(multi)
+
+
+-------[ "Index 2D Array" ]--------------------------------------------------------------------------
+
+print("Indexing a 2D array.")
+print(multi[0, 1])
+
+
+-------[ "Get Boolean Array" ]-----------------------------------------------------------------------
+
+print("Comparing array values to a number.")
+print(multi > 4)
+
+
+-------[ "Get Values Matching Condition" ]-----------------------------------------------------------
+
+print("Getting values matching condition.")
+print(multi[multi > 4])
+
+
+-------[ "Import pandas Module" ]--------------------------------------------------------------------
+
+import pandas as pd
+
+
+-------[ "Read CSV File" ]---------------------------------------------------------------------------
+
+orders = pd.read_csv("orders.csv")
+
+
+-------[ "Get DataFrame Info" ]----------------------------------------------------------------------
+
+print(orders)
+orders.info()
+
+
+-------[ "Drop Column" ]-----------------------------------------------------------------------------
+
+orders.drop(columns=["Shipping Method"], inplace=True)
+
+
+-------[ "Create Profit Column" ]--------------------------------------------------------------------
+
+orders["Profit"] = orders["Sales"] - orders["COGS"]
+
+
+-------[ "Split Names" ]-----------------------------------------------------------------------------
+
+orders[["First Name", "Last Name"]] = \
+orders["Customer Name"].str.split(" ", expand=True)
+orders.drop(columns=["Customer Name"], inplace=True)
+
+
+-------[ "Sort Rows" ]-------------------------------------------------------------------------------
+
+orders.sort_values(["Order Month", "Last Name", "First Name"], inplace=True)
+
+
+-------[ "Print and Save Data" ]---------------------------------------------------------------------
+
+print(orders)
+orders.to_csv("orders_clean.csv")
+
+
+-------[ "Import Matplotlib and Read Cleaned Data" ]-------------------------------------------------
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+orders = pd.read_csv("orders_clean.csv")
+
+
+-------[ "Convenience Variables" ]-------------------------------------------------------------------
+
+months = orders["Order Month"]
+sales = orders["Sales"]
+
+
+-------[ "Plot Line Graph" ]-------------------------------------------------------------------------
+
+fig = plt.figure()
+ax = fig.subplots(1, 1)
+ax.plot(months, sales)
+plt.show()
+
+
+-------[ "Group Totals by Month" ]-------------------------------------------------------------------
+
+totals_by_month = orders.groupby(["Order Month"]).sum()
+
+
+-------[ "Import scikit-learn and Read Cleaned Data" ]-----------------------------------------------
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+orders = pd.read_csv("orders_clean.csv")
+
+
+-------[ "Holdout Method" ]--------------------------------------------------------------------------
+
+# Perform holdout method.
+X = orders[["Sales"]]
+y = orders["Profit"]
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+
+-------[ "Train Model" ]-----------------------------------------------------------------------------
+
+# Train linear regression model.
+linreg = LinearRegression()
+linreg.fit(X_train, y_train)
+
+
+-------[ "Predict Test Set" ]------------------------------------------------------------------------
+
+# Predict results on test set.
+y_pred = linreg.predict(X_test)
+
+
+-------[ "Prediction Results" ]----------------------------------------------------------------------
+
+results = pd.DataFrame({"Actual": y_test, "Predicted": y_pred})
+print(results)
+
+
+-------[ "Visualize Training Fit" ]------------------------------------------------------------------
+
+# Visualize the linear regression model.
+fig, ax = plt.subplots(1, 2)
+
+ax[0].scatter(X_train, y_train, color="red")
+ax[0].plot(X_train, linreg.predict(X_train))
+ax[0].set_title("Training Set")
+ax[0].set_xlabel("Sales")
+ax[0].set_ylabel("Profit")
+
+
+-------[ "Visualize Test Fit" ]----------------------------------------------------------------------
+
+ax[1].scatter(X_test, y_test, color="red")
+ax[1].plot(X_test, y_pred)
+ax[1].set_title("Test Set")
+ax[1].set_xlabel("Sales")
+ax[1].set_ylabel("Profit")
+
+plt.show()
+
+
+-------[ "Predict and Plot Unseen Data" ]------------------------------------------------------------
+
+# Predict profits from unseen sales figure.
+unseen_sale = pd.DataFrame({"Sales": [157.00]})
+unseen_pred = linreg.predict(unseen_sale)
+
+fig, ax = plt.subplots()
+ax.scatter(X_test, y_test, color="red")
+ax.plot(X_train, linreg.predict(X_train))
+ax.scatter(unseen_sale, unseen_pred, color="black", marker="X", s=100)
+ax.set_title("Predicted Profit for $157 Sale")
+ax.set_xlabel("Sales")
+ax.set_ylabel("Profit")

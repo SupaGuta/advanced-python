@@ -1,0 +1,175 @@
+-------[ "Connect to Inventory DB" ]-----------------------------------------------------------------
+
+"""This module retrieves info from an inventory database."""
+
+from sqlite3 import connect
+
+conn = connect("inventory.db")
+cursor = conn.cursor()
+
+
+-------[ "Describe Inventory DB" ]-------------------------------------------------------------------
+
+# Describe the inventory table fields.
+query = "PRAGMA table_info([inventory])"
+cursor.execute(query)
+
+print(cursor.fetchall())
+
+
+-------[ "Print Inventory DB" ]----------------------------------------------------------------------
+
+# Print the inventory table fields.
+query = "SELECT * FROM inventory"
+cursor.execute(query)
+
+records = cursor.fetchall()
+
+for record in records:
+    print(record)
+
+conn.close()
+
+
+-------[ "Create Delivery DB" ]----------------------------------------------------------------------
+
+"""This module creates the delivery database."""
+
+from sqlite3 import connect
+
+conn = connect("delivery.db")
+cursor = conn.cursor()
+
+
+-------[ "Create Products Table" ]-------------------------------------------------------------------
+
+# Create products table.
+prod_query = """
+	     CREATE TABLE products (
+                 prod_name TEXT NOT NULL UNIQUE,
+                 price NUMERIC NOT NULL
+             )
+             """
+
+cursor.execute(prod_query)
+
+print("The products table was created in the delivery database.")
+
+
+-------[ "Create Orders Table" ]---------------------------------------------------------------------
+
+# Create orders table.
+orders_query = """
+	       CREATE TABLE orders (
+                   order_num INTEGER NOT NULL UNIQUE,
+                   order_date TEXT NOT NULL,
+                   ship_method TEXT NOT NULL,
+                   total_price NUMERIC NOT NULL,
+                   PRIMARY KEY(order_num AUTOINCREMENT)
+               )
+               """
+
+cursor.execute(orders_query)
+conn.close()
+
+print("The orders table was created in the delivery database.")
+
+
+-------[ "Connect to Delivery DB" ]------------------------------------------------------------------
+
+"""This module inserts product data into the delivery database."""
+
+from sqlite3 import connect
+
+conn = connect("delivery.db")
+cursor = conn.cursor()
+
+
+-------[ "Populate Products Table" ]-----------------------------------------------------------------
+
+query = "INSERT INTO products (prod_name, price) VALUES (?, ?)"
+vals = [("Lumber – 2×4×96 inch", 5.50),
+        ("Lumber – 2×6×96 inch", 8.50),
+        ("Lumber – 2×4×96 inch (Treated)", 8.75),
+        ("Lumber – 2×6×96 inch (Treated)", 13.25),
+        ("Plywood – 1/4×48×96 inch", 33.00),
+        ("Plywood – 1/2×48×96 inch", 37.25),
+        ("Plywood – 1/2×48×96 inch (Particleboard)", 19.25)]
+
+cursor.executemany(query, vals)
+
+conn.commit()
+conn.close()
+
+print(f"{cursor.rowcount} record(s) inserted into the products table.")
+
+
+-------[ "Define Update Method" ]--------------------------------------------------------------------
+
+    def update(self):
+        for i in range(len(self.products)):
+            self.prices[i] = self.ent_price[i].get()
+
+
+-------[ "Define Update Query" ]---------------------------------------------------------------------
+
+            query = """
+                    UPDATE products
+                    SET price = ?
+                    WHERE prod_name = ?
+                    """
+            vals = (self.prices[i], self.products[i])
+            self.cursor.execute(query, vals)
+            self.conn.commit()
+
+        self.conn.close()
+        self.ent_update.delete(0, END)
+        self.ent_update.insert(END, "Updated!")
+
+
+-------[ "Connect Calculator to DB" ]----------------------------------------------------------------
+               
+        self.conn = connect("delivery.db")
+        self.cursor = self.conn.cursor()
+
+
+-------[ "Retrieve Product Data DB" ]----------------------------------------------------------------
+
+        self.cursor.execute("SELECT prod_name, price FROM products")
+        self.row = self.cursor.fetchall()
+        for row in self.row:
+            self.products.append(row[0])
+            self.prices.append(Decimal(row[1]))
+        self.conn.close()
+
+
+-------[ "Widgets for Submitting Order" ]------------------------------------------------------------
+
+        row += 1
+        self.str_submit = StringVar()
+        self.btn_submit = Button(self, text="Submit Order",
+                                 command=self.submit)
+        self.btn_submit.grid(row=row, column=0)
+        self.lbl_result = Label(self, textvariable=self.str_submit)
+        self.lbl_result.grid(row=row, column=1, sticky="W")
+
+
+-------[ "Define Submit Method" ]--------------------------------------------------------------------
+
+    def submit(self):
+        """Insert order information into orders table."""
+        self.conn = connect("delivery.db")
+        self.cursor = self.conn.cursor()
+
+        query = """
+                INSERT INTO orders
+                (order_date, ship_method, total_price)
+                VALUES (?, ?, ?)
+                """
+        today = date.today()
+        vals = (today.isoformat(), self.str_ship.get(), str(self.total))
+
+        self.cursor.execute(query, vals)
+        self.conn.commit()
+        self.conn.close()
+        self.str_submit.set(f"Order no. {self.cursor.lastrowid} submitted.")

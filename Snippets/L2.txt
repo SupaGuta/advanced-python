@@ -1,0 +1,211 @@
+-------[ "Define Wood Class" ]-----------------------------------------------------------------------
+
+"""This module maintains the inventory and specifications of wood products."""
+
+class Wood:
+    """This class retrieves and displays wood product data."""
+    
+    def __init__(self, product, form, price, inventory):
+        """Construct class instance with wood product attributes."""
+        self.__product = product
+        self.__form = form
+        self.__price = price
+        self.__inventory = inventory
+
+
+-------[ "Define Wood Properties" ]------------------------------------------------------------------
+
+    # Define properties for wood products.    
+    @property
+    def product(self):
+        return self.__product
+
+    @property
+    def form(self):
+        return self.__form
+
+    @property
+    def price(self):
+        return self.__price
+
+    @property
+    def inventory(self):
+        return self.__inventory
+    
+    @product.setter
+    def product(self, product):
+        self.__product = product
+        
+    @form.setter
+    def form(self, form):
+        self.__form = form
+        
+    @price.setter
+    def price(self, price):
+        self.__price = price
+        
+    @inventory.setter
+    def inventory(self, inventory):
+        self.__inventory = inventory
+
+
+-------[ "Display and Sell Methods" ]----------------------------------------------------------------
+
+    def display(self):
+        """Display the attributes of a wood product."""
+        print(f"{self.product} ({self.form}) | "
+              f"Price: {self.price:.2f}, Inventory: {self.inventory}")
+
+    def sell_wood(self, quantity):
+        """Sell a specified number of a wood product."""
+        self.__inventory = self.__inventory - quantity
+        print(f"\nSold {quantity} pieces of {self.product}.\n")
+
+
+-------[ "Define Plywood Class" ]--------------------------------------------------------------------
+
+class Plywood(Wood):
+    """This class retrieves and displays plywood data."""
+
+    def __init__(self, product, form, price, inventory, width, length):
+        """Construct class instance with plywood attributes."""
+        super().__init__(product, form, price, inventory)
+        self.__width = width
+        self.__length = length
+
+
+-------[ "Define Plywood Properties" ]---------------------------------------------------------------
+
+    # Define properties for plywood products.    
+    @property
+    def width(self):
+        return self.__width
+    
+    @property
+    def length(self):
+        return self.__length
+    
+    @width.setter
+    def width(self, width):
+        self.__width = width
+    
+    @length.setter
+    def length(self, length):
+        self.__length = length
+
+
+-------[ "Display Plywood Dimensions" ]--------------------------------------------------------------
+
+    def display(self):
+        """Display the attributes of a plywood product."""
+        print(f"This plywood is {self.width} inches wide"
+              f" and {self.length} inches long.")
+
+
+-------[ "Import for Test" ]-------------------------------------------------------------------------
+
+"""This module imports the Wood and Plywood classes and tests them."""
+
+from wood import Wood, Plywood
+
+
+-------[ "Create Wood Instances" ]-------------------------------------------------------------------
+
+# Create instances of the Wood and Plywood classes.
+wood1 = Wood("Lumber – 2×4 inch", "Untreated", 5.50, 10)
+plywood1 = Plywood("Plywood – 1/4 inch", "Sanded", 33.00, 10, 48, 96)
+
+
+-------[ "Test Wood Instances" ]---------------------------------------------------------------------
+
+# Display the Wood and Plywood instance values.
+wood1.display()
+plywood1.display()
+
+# Sell three pieces of wood and display the results.
+wood1.sell_wood(3)
+wood1.display()
+
+# Change plywood width to 24 inches and display the results.
+plywood1.width = 24
+plywood1.display()
+
+
+-------[ "Create Plywood Instance" ]-----------------------------------------------------------------
+
+plywood1 = Plywood("Plywood – 1/4 inch", "Sanded", 33.00, 20)
+plywood1.display()
+
+
+-------[ "Override Methods" ]------------------------------------------------------------------------
+
+    def __eq__(self, other):
+        """Override the equal method."""
+        if self.price == other.price:
+            return True
+
+    def __gt__(self, other):
+        """Override the greater-than method."""
+        if self.price > other.price:
+            return True
+
+    def __lt__(self, other):
+        """Override the less-than method."""
+        if self.price < other.price:
+            return True
+            
+
+-------[ "Compare Instances" ]-----------------------------------------------------------------------
+
+plywood2 = Plywood("Plywood – 1/8 inch", "Rough", 27.00, 25)
+
+if plywood1 == plywood2:
+    print("Both products cost the same.")
+elif plywood1 > plywood2:
+    print(f"{plywood1.product} is more expensive than {plywood2.product}.")
+
+
+-------[ "Define Factory Method" ]-------------------------------------------------------------------
+
+"""This module creates Plywood or Lumber subclass objects using a 
+factory method defined in the Wood superclass."""
+
+class Wood:
+    """This class creates a subclass object using a factory method."""
+
+    def factory(form):
+        """Create Plywood or Lumber subclasses."""
+
+
+-------[ "Define Subclasses" ]-----------------------------------------------------------------------
+
+        class Plywood(Wood):
+            """This class displays plywood text."""
+
+            def display(self):
+                print("This is new plywood.")
+
+        class Lumber(Wood):
+            """This class displays lumber text."""
+
+            def display(self):
+                print("This is new lumber.")
+
+
+-------[ "Test Subclass Attribute" ]-----------------------------------------------------------------
+
+        # Test the form attribute and run appropriate subclass.
+        if (form == "Plywood"):
+            return Plywood()
+        elif (form == "Lumber"):
+            return Lumber()
+
+
+-------[ "Test Factory-Built Instances" ]------------------------------------------------------------
+
+# Create plywood and lumber products.
+plywood1 = Wood.factory("Plywood")
+lumber1 = Wood.factory("Lumber")
+
+plywood1.display()
+lumber1.display()

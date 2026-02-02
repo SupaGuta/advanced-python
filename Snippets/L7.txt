@@ -1,0 +1,64 @@
+-------[ "Handle Non-Numeric Quantities" ]-----------------------------------------------------------
+
+                try:
+                    int(self.ent_quant[i].get())
+                except ValueError:
+                    self.str_submit.set(f"'{self.ent_quant[i].get()}' "
+                                        f"is invalid. Must be whole number.")
+                    return
+                else:
+                    self.total += self.prices[i] * int(self.ent_quant[i].get())
+
+
+-------[ "Instantiate Total in Constructor" ]--------------------------------------------------------
+
+        self.total = 0
+
+
+-------[ "Test Total Value" ]------------------------------------------------------------------------
+
+        if self.total <= 0:
+            self.str_submit.set("Calculate price before submitting order.")
+        else:
+
+
+-------[ "Instantiate Quantity" ]--------------------------------------------------------------------
+
+        self.qty = 0
+
+
+-------[ "Calculate Quantity" ]----------------------------------------------------------------------
+
+                    self.qty += int(self.ent_quant[i].get())
+
+
+-------[ "Test Quantity Value" ]---------------------------------------------------------------------
+
+        elif self.qty <= 0:
+            self.str_submit.set("Must specify products to order.")
+
+
+-------[ "Import GetWDCData" ]-----------------------------------------------------------------------
+
+from get_wdc_data import GetWDCData
+
+
+-------[ "Product Assert" ]--------------------------------------------------------------------------
+
+        self.assertEqual(len(GetWDCData.get_products()), 7)
+
+
+-------[ "Price Assert" ]----------------------------------------------------------------------------
+
+        self.assertEqual(len(GetWDCData.get_prices()), 4)
+
+
+-------[ "Query Data" ]------------------------------------------------------------------------------
+
+from sqlite3 import connect
+
+conn = connect("delivery.db")
+cursor = conn.cursor()
+cursor.execute("SELECT COUNT(*) FROM products")
+row_count = int(cursor.fetchone()[0])
+conn.close()

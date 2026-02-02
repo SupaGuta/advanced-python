@@ -1,0 +1,105 @@
+-------[ "Construct Flask Objects" ]-----------------------------------------------------------------
+
+app = Flask(__name__)
+api = Api(app)
+
+
+-------[ "Return Products JSON" ]--------------------------------------------------------------------
+
+        return jsonify({"products": self.products})
+
+
+-------[ "Return Prices JSON" ]----------------------------------------------------------------------
+
+        self.prices_str = [str(price) for price in self.prices]
+        return jsonify({"prices": self.prices_str})
+
+
+-------[ "Define Submit Class" ]---------------------------------------------------------------------
+
+class Submit(Resource):
+    """Inserts order data into orders table."""
+
+    def post(self):
+        post_ship = request.json.get("ship")
+        post_total = request.json.get("total")
+
+
+-------[ "Process Orders" ]--------------------------------------------------------------------------
+
+        self.conn = connect("delivery.db")
+        self.cursor = self.conn.cursor()
+
+        query = """
+                INSERT INTO orders
+                (order_date, ship_method, total_price)
+                VALUES (?, ?, ?)
+                """
+        today = date.today()
+        vals = (today.isoformat(), post_ship, post_total)
+
+        self.cursor.execute(query, vals)
+        self.conn.commit()
+        self.conn.close()
+
+        return jsonify(self.cursor.lastrowid)
+
+
+-------[ "Create Endpoints" ]------------------------------------------------------------------------
+
+# Add the resource endpoints.
+api.add_resource(Products, "/products")
+api.add_resource(Prices, "/prices")
+api.add_resource(Submit, "/submit")
+
+app.run()
+
+
+-------[ "GET Request for Products" ]----------------------------------------------------------------
+
+        get_prod_names = requests.get("http://127.0.0.1:5000/products")
+        tmp_prod_names = json.loads(get_prod_names.text)
+        self.products = tmp_prod_names["products"]
+
+
+-------[ "GET Request for Prices" ]------------------------------------------------------------------
+
+        get_prices = requests.get("http://127.0.0.1:5000/prices")
+        tmp_prices = json.loads(get_prices.text)
+        self.prices = [Decimal(price) for price in tmp_prices["prices"]]
+
+
+-------[ "POST Request for Orders" ]-----------------------------------------------------------------
+
+        ship = self.str_ship.get()
+        total = str(self.total)
+        send = {"ship": ship, "total": total}
+        post_total = requests.post("http://127.0.0.1:5000/submit",
+                                   json=send)
+   
+
+-------[ "Import HTTP Authentication" ]--------------------------------------------------------------
+
+from flask_httpauth import HTTPBasicAuth
+
+
+-------[ "Client Credentials" ]----------------------------------------------------------------------
+
+auth = HTTPBasicAuth()
+user_data = {"client": "Pa22w0rd"}
+
+
+-------[ "Credentials Verification" ]----------------------------------------------------------------
+
+    @auth.verify_password
+    def verify(username, password):
+        if username in user_data and user_data[username] == password:
+            return username
+    @auth.login_required
+
+
+-------[ "Print 401 Status" ]------------------------------------------------------------------------
+
+        if get_prod_names.status_code == 401:
+            print(f"401 {get_prod_names.text}")
+            exit()

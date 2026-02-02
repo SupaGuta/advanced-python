@@ -1,0 +1,18 @@
+-------[ "Required Packages" ]-----------------------------------------------------------------------
+
+    install_requires=[
+        "requests>=2.31.0",
+        "Flask>=3.0.3",
+        "Flask_Restful>=0.3.10",
+        "Flask_HTTPAuth>=4.8.0"
+    ]
+
+
+-------[ "Required Data" ]---------------------------------------------------------------------------
+
+    package_data={"wdc_service": ["delivery.db"]}
+
+
+-------[ "Generate Executable" ]---------------------------------------------------------------------
+
+pyinstaller wdc_client.py
