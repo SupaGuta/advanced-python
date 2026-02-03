@@ -10,6 +10,21 @@ class Wood:
         self.__price = price
         self.__inventory = inventory
 
+    def __eq__(self, other):
+        """Override the equal method."""
+        if self.price == other.price:
+            return True
+
+    def __gt__(self, other):
+        """Override the greater-than method."""
+        if self.price > other.price:
+            return True
+
+    def __lt__(self, other):
+        """Override the less-than method."""
+        if self.price < other.price:
+            return True
+        
     # Define properties for wood products.    
     @property
     def product(self):
@@ -56,7 +71,7 @@ class Wood:
 class Plywood(Wood):
     """This class retrieves and displays plywood data."""
 
-    def __init__(self, product, form, price, inventory, width, length):
+    def __init__(self, product, form, price, inventory, width=48, length=96):
         """Construct class instance with plywood attributes."""
         super().__init__(product, form, price, inventory)
         self.__width = width
