@@ -4,7 +4,6 @@ products from Woodworkers Wheelhouse."""
 import requests
 import json
 from decimal import Decimal
-from datetime import date
 from tkinter import (Tk, Frame, Button, Entry, Label,
                      Menu, Radiobutton, StringVar, END)
 
@@ -17,6 +16,20 @@ class Application(Frame):
         self.grid()
         self.products, self.prices = [], []
         self.ship_days = {"1 day": 20.00, "2 days": 15.00, "3 days": 10.00}
+        
+        get_prod_names = requests.get("http://127.0.0.1:5000/products", 
+                                      auth=("client", "Pa22w0rd"))
+        
+        if get_prod_names.status_code == 401:
+            print(f"401 {get_prod_names.text}")
+            exit()
+
+        tmp_prod_names = json.loads(get_prod_names.text)
+        self.products = tmp_prod_names["products"]
+        
+        get_prices = requests.get("http://127.0.0.1:5000/prices")
+        tmp_prices = json.loads(get_prices.text)
+        self.prices = [Decimal(price) for price in tmp_prices["prices"]]
 
         self.create_widgets()
 
@@ -120,9 +133,14 @@ class Application(Frame):
         self.ent_result.insert(END, str_price)
 
     def submit(self):
-        """Insert order information into orders table."""
+        """Insert order information into orders table."""        
+        ship = self.str_ship.get()
+        total = str(self.total)
+        send = {"ship": ship, "total": total}
+        post_total = requests.post("http://127.0.0.1:5000/submit",
+                                   json=send)
 
-        self.str_submit.set(f"Order no. {self.cursor.lastrowid} submitted.")
+        self.str_submit.set(f"Order no. {post_total.text} submitted.")
 
 window = Tk()
 window.title("Wood Delivery Calculator")
