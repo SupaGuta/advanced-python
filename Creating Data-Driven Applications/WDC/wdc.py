@@ -16,6 +16,16 @@ class Application(Frame):
         self.grid()
         self.products, self.prices = [], []
         self.ship_days = {"1 day": 20.00, "2 days": 15.00, "3 days": 10.00}
+                      
+        self.conn = connect("delivery.db")
+        self.cursor = self.conn.cursor()
+        
+        self.cursor.execute("SELECT prod_name, price FROM products")
+        self.row = self.cursor.fetchall()
+        for row in self.row:
+            self.products.append(row[0])
+            self.prices.append(Decimal(row[1]))
+        self.conn.close()
 
         self.create_widgets()
 
@@ -75,6 +85,14 @@ class Application(Frame):
         self.ent_result = Entry(self, width=10)
         self.ent_result.grid(row=row, column=1, sticky="W")
 
+        row += 1
+        self.str_submit = StringVar()
+        self.btn_submit = Button(self, text="Submit Order",
+                                 command=self.submit)
+        self.btn_submit.grid(row=row, column=0)
+        self.lbl_result = Label(self, textvariable=self.str_submit)
+        self.lbl_result.grid(row=row, column=1, sticky="W")
+
         menu_bar = Menu(self)
         file_menu = Menu(menu_bar)
         menu_bar.add_cascade(label="File", menu=file_menu)
@@ -100,15 +118,33 @@ class Application(Frame):
                 self.total += self.prices[i] * int(self.ent_quant[i].get())
 
         if self.str_ship.get() == "1 day":
-            self.total += self.ship_days["1 day"]
+            self.total += Decimal(self.ship_days["1 day"])
         elif self.str_ship.get() == "2 days":
-            self.total += self.ship_days["2 days"]
+            self.total += Decimal(self.ship_days["2 days"])
         elif self.str_ship.get() == "3 days":
-            self.total += self.ship_days["3 days"]
+            self.total += Decimal(self.ship_days["3 days"])
 
         str_price = f"{self.total:.2f}"
         self.ent_result.delete(0, END)
         self.ent_result.insert(END, str_price)
+        
+    def submit(self):
+        """Insert order information into orders table."""
+        self.conn = connect("delivery.db")
+        self.cursor = self.conn.cursor()
+
+        query = """
+                INSERT INTO orders
+                (order_date, ship_method, total_price)
+                VALUES (?, ?, ?)
+                """
+        today = date.today()
+        vals = (today.isoformat(), self.str_ship.get(), str(self.total))
+
+        self.cursor.execute(query, vals)
+        self.conn.commit()
+        self.conn.close()
+        self.str_submit.set(f"Order no. {self.cursor.lastrowid} submitted.")
 
 window = Tk()
 window.title("Wood Delivery Calculator")

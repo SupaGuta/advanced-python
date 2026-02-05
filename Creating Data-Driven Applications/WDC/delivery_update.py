@@ -53,6 +53,23 @@ class Application(Frame):
 
         self.ent_update = Entry(self, width=10)
         self.ent_update.grid(row=row, column=1)
+        
+    def update(self):
+        for i in range(len(self.products)):
+            self.prices[i] = self.ent_price[i].get()
+            
+            query = """
+                    UPDATE products
+                    SET price = ?
+                    WHERE prod_name = ?
+                    """
+            vals = (self.prices[i], self.products[i])
+            self.cursor.execute(query, vals)
+            self.conn.commit()
+
+        self.conn.close()
+        self.ent_update.delete(0, END)
+        self.ent_update.insert(END, "Updated!")
 
 window = Tk()
 window.title("Wood Prices Updater")
