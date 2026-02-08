@@ -13,6 +13,7 @@ class Application(Frame):
     def __init__(self, master):
         """Construct class instance with product data."""
         super().__init__(master)
+        self.total = 0
         self.grid()
         self.products, self.prices = [], []
         self.ship_days = {"1 day": 20.00, "2 days": 15.00, "3 days": 10.00}
@@ -117,9 +118,18 @@ class Application(Frame):
     def calculate(self):
         """Calculate the total amount of the order."""
         self.total = 0
+        self.qty = 0
         for i in range(len(self.products)):
             if self.ent_quant[i].get():
-                self.total += self.prices[i] * int(self.ent_quant[i].get())
+                try:
+                    int(self.ent_quant[i].get())
+                except ValueError:
+                    self.str_submit.set(f"'{self.ent_quant[i].get()}' "
+                                        f"is invalid. Must be whole number.")
+                    return
+                else:
+                    self.total += self.prices[i] * int(self.ent_quant[i].get())
+                    self.qty += int(self.ent_quant[i].get())
 
         if self.str_ship.get() == "1 day":
             self.total += Decimal(self.ship_days["1 day"])
@@ -136,10 +146,15 @@ class Application(Frame):
         """Submit order information to web service."""
         ship = self.str_ship.get()
         total = str(self.total)
-        send = {"ship": ship, "total": total}
-        post_total = requests.post("http://127.0.0.1:5000/submit",
-                                   json=send)
-        self.str_submit.set(f"Order no. {post_total.text} submitted.")
+        if self.total <= 0:
+            self.str_submit.set("Calculate price before submitting order.")
+        elif self.qty <= 0:
+            self.str_submit.set("Must specify products to order.")
+        else:
+            send = {"ship": ship, "total": total}
+            post_total = requests.post("http://127.0.0.1:5000/submit",
+                                    json=send)
+            self.str_submit.set(f"Order no. {post_total.text} submitted.")
 
 window = Tk()
 window.title("Wood Delivery Calculator")
